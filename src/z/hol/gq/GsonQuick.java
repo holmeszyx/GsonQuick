@@ -18,7 +18,7 @@ import com.google.gson.JsonPrimitive;
  * @author holmes
  *
  */
-public class GsonQuick {
+public final class GsonQuick {
     
     /**
      * Json解析器
