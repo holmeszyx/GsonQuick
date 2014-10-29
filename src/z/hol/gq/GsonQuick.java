@@ -12,6 +12,7 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSyntaxException;
 
 /**
  * Gson Quick 工具, 方便序列化对象, 对象列表
@@ -29,13 +30,25 @@ public final class GsonQuick {
      * Gson 单例
      */
     private static Gson sGson = null;
+    private static GsonQuickLogger sLogger = null;
+    
+    /**
+     * 设置json解析日志。
+     * 因为在Gson异常会被捕捉
+     * @param logger
+     */
+    public static void setLogger(GsonQuickLogger logger){
+    	sLogger = logger;
+    }
     
     /**
      * 设置一个通用的Gson
      * @param gson
      */
     public static void setGson(Gson gson){
-        sGson = gson;
+        if (sGson != gson){
+            sGson = gson;
+        }
     }
     
     /**
@@ -61,7 +74,14 @@ public final class GsonQuick {
      * @return
      */
     public static String getString(String json, String key) {
-        JsonElement element = PARSER.parse(json);
+        JsonElement element;
+		try {
+			element = PARSER.parse(json);
+		} catch (JsonSyntaxException e) {
+			// This is Auto-generated catch block
+			log(json, e);
+			return null;
+		}
         if (element.isJsonObject()){
             JsonObject obj = element.getAsJsonObject();
             JsonElement value = obj.get(key);
@@ -84,8 +104,14 @@ public final class GsonQuick {
      * @return
      */
     public static JsonObject toJsonObject(String json){
-        JsonElement element = PARSER.parse(json);
-        return element.getAsJsonObject();
+        try {
+			JsonElement element = PARSER.parse(json);
+			return element.getAsJsonObject();
+		} catch (JsonSyntaxException e) {
+			// This is Auto-generated catch block
+			log(json, e);
+			return null;
+		}
     }
     
     /**
@@ -94,8 +120,14 @@ public final class GsonQuick {
      * @return
      */
     public static JsonArray toJsonArray(String json){
-        JsonElement element = PARSER.parse(json);
-        return element.getAsJsonArray();
+        try {
+			JsonElement element = PARSER.parse(json);
+			return element.getAsJsonArray();
+		} catch (JsonSyntaxException e) {
+			// This is Auto-generated catch block
+			log(json, e);
+			return null;
+		}
     }
     
     /**
@@ -106,7 +138,13 @@ public final class GsonQuick {
      */
     public static <T> T toObject(String json, Class<T> clss){
         Gson gson = getGson();
-        return gson.fromJson(json, clss);
+        try {
+			return gson.fromJson(json, clss);
+		} catch (JsonSyntaxException e) {
+			// This is Auto-generated catch block
+			log(json, e);
+			return null;
+		}
     }
     
     /**
@@ -116,7 +154,14 @@ public final class GsonQuick {
      * @return
      */
     public static <T> List<T> toList(String json, Class<T> clss){
-        JsonElement element = PARSER.parse(json);
+        JsonElement element;
+		try {
+			element = PARSER.parse(json);
+		} catch (JsonSyntaxException e) {
+			// This is Auto-generated catch block
+			log(json, e);
+			return null;
+		}
         if (element.isJsonArray()){
             Gson gson = getGson();
             JsonArray array = element.getAsJsonArray();
@@ -124,12 +169,30 @@ public final class GsonQuick {
             ArrayList<T> result = new ArrayList<T>(size);
             for (int i = 0; i < size; i ++){
                 JsonElement item = array.get(i);
-                T t = gson.fromJson(item, clss);
+                T t;
+				try {
+					t = gson.fromJson(item, clss);
+				} catch (JsonSyntaxException e) {
+					// This is Auto-generated catch block
+					log(item.toString(), e);
+					continue;
+				}
                 result.add(t);
             }
             return result;
         }
         return null;
+    }
+    
+    /**
+     * 写日志
+     * @param json
+     * @param e
+     */
+    private static void log(String json, Exception e){
+    	if (sLogger != null){
+    		sLogger.e(json, e);
+    	}
     }
     
 }
