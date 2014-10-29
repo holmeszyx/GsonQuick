@@ -1,5 +1,6 @@
 package z.hol.gq;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -140,6 +141,23 @@ public final class GsonQuick {
         Gson gson = getGson();
         try {
 			return gson.fromJson(json, clss);
+		} catch (JsonSyntaxException e) {
+			// This is Auto-generated catch block
+			log(json, e);
+			return null;
+		}
+    }
+
+    /**
+     * 将json对象序列化为一个对象实例
+     * @param json
+     * @param type 要序列化为的对象, 主要用于带范型的类
+     * @return
+     */
+    public static <T> T toObject(String json, Type type){
+        Gson gson = getGson();
+        try {
+			return gson.fromJson(json, type);
 		} catch (JsonSyntaxException e) {
 			// This is Auto-generated catch block
 			log(json, e);
