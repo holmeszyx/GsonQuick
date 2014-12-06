@@ -13,7 +13,6 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSyntaxException;
 
 /**
  * Gson Quick 工具, 方便序列化对象, 对象列表
@@ -78,7 +77,7 @@ public final class GsonQuick {
         JsonElement element;
 		try {
 			element = PARSER.parse(json);
-		} catch (JsonSyntaxException e) {
+		} catch (Exception e) {
 			// This is Auto-generated catch block
 			log(json, e);
 			return null;
@@ -108,7 +107,7 @@ public final class GsonQuick {
         try {
 			JsonElement element = PARSER.parse(json);
 			return element.getAsJsonObject();
-		} catch (JsonSyntaxException e) {
+		} catch (Exception e) {
 			// This is Auto-generated catch block
 			log(json, e);
 			return null;
@@ -124,7 +123,7 @@ public final class GsonQuick {
         try {
 			JsonElement element = PARSER.parse(json);
 			return element.getAsJsonArray();
-		} catch (JsonSyntaxException e) {
+		} catch (Exception e) {
 			// This is Auto-generated catch block
 			log(json, e);
 			return null;
@@ -141,7 +140,7 @@ public final class GsonQuick {
         Gson gson = getGson();
         try {
 			return gson.fromJson(json, clss);
-		} catch (JsonSyntaxException e) {
+		} catch (Exception e) {
 			// This is Auto-generated catch block
 			log(json, e);
 			return null;
@@ -158,9 +157,43 @@ public final class GsonQuick {
         Gson gson = getGson();
         try {
 			return gson.fromJson(json, type);
-		} catch (JsonSyntaxException e) {
+		} catch (Exception e) {
 			// This is Auto-generated catch block
 			log(json, e);
+			return null;
+		}
+    }
+    
+    /**
+     * 将json对象序列化为一个对象实例
+     * @param json
+     * @param clss 要序列化为的对象
+     * @return
+     */
+    public static <T> T toObject(JsonElement json, Class<T> clss){
+        Gson gson = getGson();
+        try {
+			return gson.fromJson(json, clss);
+		} catch (Exception e) {
+			// This is Auto-generated catch block
+			log("json: " + json, e);
+			return null;
+		}
+    }
+
+    /**
+     * 将json对象序列化为一个对象实例
+     * @param json
+     * @param type 要序列化为的对象, 主要用于带范型的类
+     * @return
+     */
+    public static <T> T toObject(JsonElement json, Type type){
+        Gson gson = getGson();
+        try {
+			return gson.fromJson(json, type);
+		} catch (Exception e) {
+			// This is Auto-generated catch block
+			log("json: " + json, e);
 			return null;
 		}
     }
@@ -175,7 +208,7 @@ public final class GsonQuick {
         JsonElement element;
 		try {
 			element = PARSER.parse(json);
-		} catch (JsonSyntaxException e) {
+		} catch (Exception e) {
 			// This is Auto-generated catch block
 			log(json, e);
 			return null;
@@ -190,7 +223,112 @@ public final class GsonQuick {
                 T t;
 				try {
 					t = gson.fromJson(item, clss);
-				} catch (JsonSyntaxException e) {
+				} catch (Exception e) {
+					// This is Auto-generated catch block
+					log(item.toString(), e);
+					continue;
+				}
+                result.add(t);
+            }
+            return result;
+        }
+        return null;
+    }
+    
+    /**
+     * 将json数组序列化为一个对象的List实例
+     * @param json
+     * @param clss 对象类型
+     * @return
+     */
+    public static <T> List<T> toList(String json, Type type){
+        JsonElement element;
+		try {
+			element = PARSER.parse(json);
+		} catch (Exception e) {
+			// This is Auto-generated catch block
+			log(json, e);
+			return null;
+		}
+        if (element.isJsonArray()){
+            Gson gson = getGson();
+            JsonArray array = element.getAsJsonArray();
+            int size = array.size();
+            ArrayList<T> result = new ArrayList<T>(size);
+            for (int i = 0; i < size; i ++){
+                JsonElement item = array.get(i);
+                T t;
+				try {
+					t = gson.fromJson(item, type);
+				} catch (Exception e) {
+					// This is Auto-generated catch block
+					log(item.toString(), e);
+					continue;
+				}
+                result.add(t);
+            }
+            return result;
+        }
+        return null;
+    }
+
+    /**
+     * 将json数组序列化为一个对象的List实例
+     * @param json
+     * @param type 对象类型
+     * @return
+     */
+    public static <T> List<T> toList(JsonElement json, Class<T> clss){
+        final JsonElement element = json;
+        if (json == null){
+			log("json: " + json, new NullPointerException("json is null"));
+			return null;
+        }
+        if (element.isJsonArray()){
+            Gson gson = getGson();
+            JsonArray array = element.getAsJsonArray();
+            int size = array.size();
+            ArrayList<T> result = new ArrayList<T>(size);
+            for (int i = 0; i < size; i ++){
+                JsonElement item = array.get(i);
+                T t;
+				try {
+					t = gson.fromJson(item, clss);
+				} catch (Exception e) {
+					// This is Auto-generated catch block
+					log(item.toString(), e);
+					continue;
+				}
+                result.add(t);
+            }
+            return result;
+        }
+        return null;
+    }
+    
+    /**
+     * 将json数组序列化为一个对象的List实例
+     * @param json
+     * @param type 对象类型
+     * @return
+     */
+    public static <T> List<T> toList(JsonElement json, Type type){
+        final JsonElement element = json;
+        if (json == null){
+			log("json: " + json, new NullPointerException("json is null"));
+			return null;
+        }
+        if (element.isJsonArray()){
+            Gson gson = getGson();
+            JsonArray array = element.getAsJsonArray();
+            int size = array.size();
+            ArrayList<T> result = new ArrayList<T>(size);
+            for (int i = 0; i < size; i ++){
+                JsonElement item = array.get(i);
+                T t;
+				try {
+					t = gson.fromJson(item, type);
+				} catch (Exception e) {
 					// This is Auto-generated catch block
 					log(item.toString(), e);
 					continue;
